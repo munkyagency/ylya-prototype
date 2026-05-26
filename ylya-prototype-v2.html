@@ -1,0 +1,2824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Life. Your AI. — Wireframe Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #FFFFFF;
+    --bg2: #F5F5F5;
+    --text: #1A1A1A;
+    --grey: #666666;
+    --grey-light: #999999;
+    --divider: #E0E0E0;
+    --border: #D4D4D4;
+    --black: #1A1A1A;
+  }
+  html, body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #2a2a2a;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 10px;
+    overflow-x: hidden;
+  }
+  .stage {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: var(--bg);
+    border-radius: 48px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 10px #1a1a1a, 0 0 0 11px #333;
+    position: relative;
+    overflow: hidden;
+  }
+  .notch {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 30px;
+    background: #1a1a1a;
+    border-radius: 20px;
+    z-index: 200;
+  }
+  .screen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    background: var(--bg);
+  }
+  .screen.active { display: flex; }
+  .status-bar {
+    height: 48px;
+    padding: 16px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  .status-bar .right { display: flex; gap: 6px; align-items: center; color: currentColor; }
+  .status-bar .right svg { display: block; height: 12px; width: auto; }
+  .content {
+    flex: 1;
+    padding: 0 24px 32px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Typography */
+  h1 { font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; color: var(--text); }
+  h2 { font-size: 22px; font-weight: 700; line-height: 1.25; letter-spacing: -0.3px; color: var(--text); }
+  h3 { font-size: 16px; font-weight: 600; color: var(--text); }
+  p { font-size: 15px; line-height: 1.5; color: var(--grey); }
+  .small { font-size: 13px; color: var(--grey); }
+  .tiny { font-size: 11px; color: var(--grey); }
+
+  /* Buttons */
+  button { outline: none; }
+  button:focus, button:focus-visible { outline: none; box-shadow: none; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: transform 0.15s, opacity 0.15s;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.97); opacity: 0.9; }
+  .btn-primary { background: var(--black); color: white; padding: 16px 28px; font-size: 16px; }
+  .btn-secondary { background: white; color: var(--black); padding: 15px 27px; font-size: 16px; border: 1px solid var(--black); }
+  .btn-small { padding: 10px 18px; font-size: 13px; }
+  .btn-full { width: 100%; }
+
+  /* Cards */
+  .card {
+    background: white;
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .card-dark { background: var(--black); color: white; border: 1px solid var(--black); }
+  .card-dark p, .card-dark .small { color: rgba(255,255,255,0.7); }
+
+  /* Icons (SVG inline, monochrome) */
+  .icon { width: 20px; height: 20px; flex-shrink: 0; }
+  .icon-lg { width: 24px; height: 24px; }
+  .icon-sm { width: 16px; height: 16px; }
+
+  /* Back button */
+  .back-btn {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; background: transparent; border: none; color: var(--text);
+  }
+
+  /* Screen 1 — Splash */
+  .splash {
+    align-items: center; justify-content: center; text-align: center;
+    animation: fadeIn 0.8s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .splash-title { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+  .splash-sub { font-size: 17px; color: var(--grey); }
+
+  /* Screen 2 */
+  .anchor {
+    margin-top: auto;
+    padding: 24px 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: transparent;
+  }
+  .anchor-link {
+    font-size: 14px;
+    color: var(--grey);
+    font-weight: 500;
+  }
+
+  /* Screen 3 — Slides */
+  .slides-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide { display: none; padding: 40px 32px; flex-direction: column; gap: 24px; flex: 1; }
+  .slide.active-slide { display: flex; }
+  .slide-illustration {
+    background: var(--bg2);
+    border: 1px solid var(--divider);
+    border-radius: 16px;
+    flex: 1;
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--grey-light);
+    font-size: 12px;
+  }
+  .slide-body { display: flex; flex-direction: column; gap: 12px; }
+  .slide-title { font-size: 26px; font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; }
+  .slide-sub { font-size: 15px; color: var(--grey); line-height: 1.5; }
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px 0 32px;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--divider); transition: all 0.3s;
+  }
+  .dot.active { background: var(--black); width: 24px; border-radius: 4px; }
+
+  /* Screen 4 — schedule */
+  .toggle {
+    display: flex;
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 4px;
+    margin: 20px 0 24px;
+  }
+  .toggle-opt {
+    flex: 1; padding: 12px 8px; font-size: 13px; font-weight: 500;
+    text-align: center; border-radius: 8px; color: var(--grey); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-opt.active { background: white; color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+  .picker-card {
+    background: white;
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .picker-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; cursor: pointer;
+  }
+  .picker-row + .picker-row { border-top: 1px solid var(--divider); }
+  .picker-label { font-size: 15px; color: var(--text); font-weight: 500; }
+  .picker-value { font-size: 15px; color: var(--grey); }
+  .picker-drum {
+    display: none;
+    background: var(--bg2);
+    padding: 16px;
+    border-top: 1px solid var(--divider);
+    justify-content: center;
+    gap: 16px;
+  }
+  .picker-drum.open { display: flex; }
+  .drum {
+    width: 70px; height: 140px;
+    background: white; border: 1px solid var(--divider); border-radius: 8px;
+    display: flex; flex-direction: column;
+    overflow: hidden; position: relative;
+  }
+  .drum::before, .drum::after {
+    content: ''; position: absolute; left: 0; right: 0; height: 50px;
+    pointer-events: none; z-index: 2;
+  }
+  .drum::before { top: 0; background: linear-gradient(180deg, white, transparent); }
+  .drum::after { bottom: 0; background: linear-gradient(0deg, white, transparent); }
+  .drum-list { overflow-y: auto; scrollbar-width: none; padding: 50px 0; }
+  .drum-list::-webkit-scrollbar { display: none; }
+  .drum-item { padding: 6px 0; text-align: center; font-size: 16px; color: var(--grey); scroll-snap-align: center; }
+  .drum-item.selected { color: var(--text); font-weight: 600; }
+
+  .pill-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .pill {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .pill.active { background: var(--black); color: white; border-color: var(--black); }
+  .pill-grey {
+    background: var(--bg2); border-color: var(--divider); color: var(--text);
+  }
+
+  .session-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: white;
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .session-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--bg2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+  }
+
+  .consultant-block {
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, #d4d4d4, #b8b8b8);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600;
+  }
+  .avatar-lg { width: 96px; height: 96px; font-size: 24px; }
+  .avatar-sm { width: 36px; height: 36px; }
+  .consultant-info { flex: 1; }
+  .consultant-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .consultant-role { font-size: 13px; color: var(--grey); }
+
+  /* Modal */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 300;
+  }
+  .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
+  .modal {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+    width: 100%;
+    max-height: 70%;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .avatar-option {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer;
+  }
+  .avatar-option .avatar { width: 60px; height: 60px; }
+  .avatar-option.selected .avatar { box-shadow: 0 0 0 3px var(--black); }
+  .avatar-option .name { font-size: 11px; color: var(--text); }
+
+  /* Screen 5 — Video call */
+  .call-screen {
+    background: #0a0a0a !important;
+    color: white;
+    overflow: hidden;
+  }
+  .call-screen .status-bar { color: white; }
+  .session-label {
+    position: absolute; top: 20px; right: 24px;
+    font-size: 10px; color: rgba(255,255,255,0.5);
+    z-index: 100;
+  }
+  .question-pill {
+    margin: 50px 16px 8px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 14px 18px;
+    color: white;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+  }
+  .question-progress {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 12px;
+  }
+  .videos {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 12px;
+    min-height: 0;
+  }
+  .video-window {
+    flex: 1 1 0;
+    min-height: 0;
+    background: #2a2a2a;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .video-window.speaking { border-color: rgba(255,255,255,0.9); }
+  .video-window .label {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    font-size: 12px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #4caf50;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.5; } }
+  .video-placeholder {
+    color: rgba(255,255,255,0.3); font-size: 11px;
+  }
+  .call-controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px 0 32px;
+  }
+  .call-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    cursor: pointer;
+  }
+  .call-btn.muted { background: #1a1a1a; color: white; }
+  .call-btn .icon-on { display: block; }
+  .call-btn .icon-off { display: none; }
+  .call-btn.muted .icon-on { display: none; }
+  .call-btn.muted .icon-off { display: block; }
+  .call-btn.paused .icon-on { display: none; }
+  .call-btn.paused .icon-off { display: block; }
+  .call-btn.stop { background: rgba(255,255,255,0.9); color: #1a1a1a; }
+  .call-btn.stop:hover { background: white; }
+
+  /* Confirmation modal (used by Screen 5 stop, Screen 9 retake) */
+  .confirm-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: calc(100% - 48px);
+    max-width: 320px;
+    text-align: center;
+  }
+  .confirm-modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .confirm-modal p { font-size: 14px; margin-bottom: 20px; }
+  .confirm-modal .actions { display: flex; flex-direction: column; gap: 8px; }
+  .modal-overlay.center { align-items: center; }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a1a1a;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 400;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Share sheet */
+  .share-modal { padding: 16px 0 24px; }
+  .share-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 20px 16px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .share-apps {
+    display: flex; gap: 16px; padding: 20px;
+    overflow-x: auto;
+  }
+  .share-apps::-webkit-scrollbar { display: none; }
+  .share-app {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .share-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: var(--bg2);
+    border: 1px solid var(--divider);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; color: var(--text);
+  }
+  .share-name { font-size: 11px; color: var(--text); }
+  .share-actions { padding: 0 20px; }
+  .share-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0;
+    font-size: 15px;
+    border-top: 1px solid var(--divider);
+    cursor: pointer;
+  }
+
+  /* Screen 5b — handoff */
+  .next-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .next-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--black); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .next-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+    padding-top: 2px;
+  }
+
+  /* First step plan cards */
+  .plan-group { margin-bottom: 20px; }
+  .plan-label {
+    font-size: 11px;
+    color: var(--grey);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .plan-card {
+    background: white;
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .plan-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .plan-meta { font-size: 12px; color: var(--grey); }
+
+  /* Screen 6 — Approval cards */
+  .swipe-stack {
+    position: relative;
+    margin: 24px 0;
+    height: 440px;
+  }
+  .swipe-card {
+    position: absolute;
+    inset: 0;
+    background: white;
+    border: 1px solid var(--divider);
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    cursor: grab;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    overflow: hidden;
+    transform-origin: center bottom;
+  }
+  .swipe-card.dragging { transition: none; cursor: grabbing; }
+  /* Stack effect — back card visible beneath */
+  .swipe-card.behind {
+    transform: scale(0.94) translateY(12px);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .swipe-card.front { z-index: 2; }
+  .swipe-card.rising {
+    animation: cardRise 0.35s ease forwards;
+  }
+  @keyframes cardRise {
+    from { transform: scale(0.94) translateY(12px); opacity: 0.7; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  /* Loading screen */
+  .loading-screen {
+    background: white;
+    align-items: stretch;
+  }
+  .loading-spinner {
+    width: 56px; height: 56px;
+    border: 3px solid var(--divider);
+    border-top-color: var(--text);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 28px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    min-height: 24px;
+    transition: opacity 0.3s;
+  }
+  .swipe-card .tint {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .swipe-card .tint.yes { background: rgba(0,0,0,0.05); }
+  .swipe-card .tint.no { background: rgba(0,0,0,0.15); }
+  .swipe-illustration {
+    flex: 1;
+    background: var(--bg2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--grey-light);
+    font-size: 11px;
+  }
+  .swipe-text {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text);
+  }
+  .swipe-hints {
+    display: flex; justify-content: space-between;
+    padding: 0 8px 8px;
+    font-size: 13px;
+    color: var(--grey);
+  }
+  .clarify-area {
+    display: none;
+    border-top: 1px solid var(--divider);
+    padding: 16px 24px;
+    background: white;
+    gap: 8px;
+    align-items: center;
+  }
+  .clarify-area.open { display: flex; }
+  .clarify-input {
+    flex: 1; background: var(--bg2); border: none; border-radius: 999px;
+    padding: 12px 16px; font-family: inherit; font-size: 14px; outline: none;
+  }
+  .icon-btn-circle {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--bg2); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Screen 7 — Results list */
+  .scenario-card {
+    background: white;
+    border: 1px solid var(--divider);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .scenario-card:active { transform: scale(0.99); }
+  .scenario-card.first {
+    background: var(--black);
+    color: white;
+    border-color: var(--black);
+  }
+  .scenario-card.first .small, .scenario-card.first p { color: rgba(255,255,255,0.7); }
+  .scenario-card.first .chip { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.2); }
+  .scenario-card.first .indicator-label { color: rgba(255,255,255,0.7); }
+  .scenario-card.first .bar { background: rgba(255,255,255,0.2); }
+  .scenario-card.first .bar-fill { background: white; }
+
+  .scenario-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; margin-bottom: 12px;
+  }
+  .scenario-name { font-size: 18px; font-weight: 700; line-height: 1.3; }
+  .scenario-pct { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+  .scenario-card.second .scenario-name { font-size: 16px; }
+  .scenario-card.second .scenario-pct { font-size: 26px; }
+  .scenario-card.third { opacity: 0.92; }
+
+  .chips-label { font-size: 11px; color: var(--grey); text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 8px; font-weight: 500; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    padding: 5px 10px;
+    background: var(--bg2);
+    border: 1px solid var(--divider);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .indicators {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--divider);
+  }
+  .scenario-card.first .indicators { border-color: rgba(255,255,255,0.15); }
+  .indicator { display: flex; flex-direction: column; gap: 4px; }
+  .indicator-label { font-size: 11px; color: var(--grey); }
+  .indicator-value { font-size: 13px; font-weight: 600; }
+  .bar {
+    height: 4px; border-radius: 2px;
+    background: var(--divider);
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .bar-fill { height: 100%; background: var(--black); border-radius: 2px; }
+
+  /* Screen 8 — detail */
+  .detail-head {
+    padding: 8px 0 16px;
+  }
+  .detail-pct {
+    font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -2px;
+    margin-top: 8px;
+  }
+  .section { margin-top: 32px; }
+  .section h3 { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+  .bullet-list { display: flex; flex-direction: column; gap: 10px; }
+  .bullet {
+    display: flex; gap: 12px;
+    font-size: 14px; line-height: 1.5; color: var(--text);
+  }
+  .bullet::before {
+    content: ''; flex-shrink: 0;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text); margin-top: 8px;
+  }
+  .change-graph {
+    display: flex; align-items: center; gap: 12px;
+    margin: 12px 0;
+  }
+  .change-circle {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid var(--divider);
+    background: var(--bg2);
+    padding: 18px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    gap: 6px;
+  }
+  .change-circle.dark { background: var(--black); color: white; border-color: var(--black); }
+  .change-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .change-pct { font-size: 26px; font-weight: 800; }
+  .change-tags { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+  .change-tag { font-size: 9px; padding: 3px 7px; background: white; color: var(--text); border-radius: 999px; }
+  .change-circle.dark .change-tag { background: rgba(255,255,255,0.15); color: white; }
+  .change-arrow { font-size: 20px; color: var(--grey); font-weight: 300; }
+
+  .indicator-block {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .indicator-block:last-child { border-bottom: none; }
+  .indicator-block .ind-label { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .indicator-block .ind-desc { font-size: 12px; color: var(--grey); margin-top: 4px; }
+  .big-number { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+
+  .timeline {
+    margin-top: 12px;
+    position: relative;
+    padding: 24px 8px 0;
+  }
+  .timeline-line {
+    position: absolute;
+    top: 32px;
+    left: 8px; right: 8px;
+    height: 2px;
+    background: var(--divider);
+  }
+  .timeline-dots {
+    display: flex; justify-content: space-between;
+    position: relative;
+  }
+  .timeline-dot {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; cursor: pointer;
+    z-index: 2;
+  }
+  .timeline-dot .circle {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white; border: 2px solid var(--text);
+  }
+  .timeline-dot.active .circle { background: var(--text); }
+  .timeline-dot .lbl { font-size: 11px; color: var(--grey); font-weight: 500; }
+  .timeline-dot.active .lbl { color: var(--text); font-weight: 600; }
+  .milestone-card {
+    margin-top: 16px;
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+    display: none;
+  }
+  .milestone-card.open { display: block; }
+
+  /* Radar */
+  .radar-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .radar-svg { width: 280px; height: 280px; }
+  .radar-axis-label { font-size: 10px; font-weight: 500; cursor: pointer; }
+  .radar-legend {
+    display: flex; justify-content: center; gap: 20px;
+    margin-top: 4px; font-size: 12px;
+  }
+  .radar-legend .key { display: flex; align-items: center; gap: 6px; color: var(--grey); }
+  .radar-legend .sq { width: 12px; height: 12px; border-radius: 2px; }
+  .radar-legend .filled { background: var(--text); }
+  .radar-legend .dashed { background: white; border: 1.5px dashed var(--text); }
+  .tooltip {
+    background: var(--text);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-top: 12px;
+    display: none;
+  }
+  .tooltip.open { display: block; }
+
+  /* Bar chart */
+  .chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    height: 220px;
+    padding: 20px 0 0;
+  }
+  .chart-bar-wrap {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .chart-value { font-size: 12px; font-weight: 600; color: var(--text); }
+  .chart-bar {
+    width: 100%;
+    background: var(--text);
+    border-radius: 6px 6px 0 0;
+    transition: opacity 0.2s;
+  }
+  .chart-bar-wrap:hover .chart-bar { opacity: 0.8; }
+  .chart-label { font-size: 11px; color: var(--grey); }
+
+  .first-step {
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 14px;
+  }
+  .first-step-label { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .first-step-text { font-size: 14px; line-height: 1.5; color: var(--text); }
+
+  .detail-actions {
+    display: flex; gap: 8px; margin-top: 28px;
+  }
+  .detail-actions .btn { flex: 1; }
+
+  /* Screen 9 — Profile */
+  .profile-top { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 0; }
+  .avatar-upload {
+    position: relative; cursor: pointer;
+  }
+  .avatar-camera {
+    position: absolute; bottom: -4px; right: -4px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--black); color: white;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid white;
+  }
+  .profile-name { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .profile-status { font-size: 13px; color: var(--grey); }
+  .profile-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+  .divider {
+    height: 1px;
+    background: var(--divider);
+    margin: 24px 0;
+  }
+  .section-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .section-title { font-size: 17px; font-weight: 700; }
+  .section-link { font-size: 14px; color: var(--text); font-weight: 500; cursor: pointer; text-decoration: underline; }
+
+  .profile-cat { margin-bottom: 16px; }
+  .cat-label {
+    font-size: 11px;
+    color: var(--grey);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .cat-text { font-size: 14px; line-height: 1.5; color: var(--text); }
+  .cat-text.collapsed { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cat-edit {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg2);
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    padding: 10px 12px;
+    resize: vertical;
+    outline: none;
+  }
+
+  .data-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+  }
+  .data-row:last-child { border-bottom: none; }
+  .data-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--bg2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .data-info { flex: 1; }
+  .data-name { font-size: 14px; font-weight: 500; }
+  .data-meta { font-size: 12px; color: var(--grey); }
+  .data-action { font-size: 13px; color: var(--grey); cursor: pointer; padding: 4px 8px; }
+  .data-action.add { color: var(--text); font-weight: 600; }
+  .data-row.not-added { cursor: default; }
+  .data-row.not-added .data-icon { opacity: 0.4; }
+  .data-row.not-added .data-name { color: var(--grey); }
+  .data-row.not-added .data-meta { color: var(--grey-light); }
+
+  /* Generic file list (used in data detail modal) */
+  .file-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--divider);
+    font-size: 14px;
+  }
+  .file-row:last-child { border-bottom: none; }
+  .file-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--bg2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .file-name { flex: 1; color: var(--text); }
+
+  .mini-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mini-card {
+    background: white;
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+  }
+  .mini-card .name { font-size: 13px; font-weight: 600; line-height: 1.3; min-height: 36px; }
+  .mini-card .pct { font-size: 22px; font-weight: 800; margin: 6px 0; }
+  .mini-card .chips { gap: 4px; }
+  .mini-card .chip { font-size: 9px; padding: 3px 6px; }
+
+  .delete-link {
+    text-align: center;
+    font-size: 13px;
+    color: var(--grey-light);
+    padding: 16px 0 8px;
+    cursor: pointer;
+  }
+
+  /* Confirm question */
+  .confirm-state {
+    display: none;
+    margin-top: 12px;
+    text-align: center;
+  }
+  .confirm-state.open { display: block; }
+  .confirm-state .q { font-size: 14px; margin-bottom: 10px; font-weight: 500; }
+  .confirm-state .actions { display: flex; gap: 8px; justify-content: center; }
+
+  /* Navigation hint */
+  .nav-hint {
+    color: white;
+    font-size: 12px;
+    opacity: 0.7;
+    text-align: center;
+  }
+  .nav-hint a { color: white; text-decoration: underline; cursor: pointer; }
+
+  .header-row {
+    position: relative;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 0 16px;
+    min-height: 36px;
+  }
+  .header-row h1 {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top: -8px; /* compensate for parent's padding-bottom:16 to keep visually centered */
+    text-align: center;
+    font-size: 17px;
+    font-weight: 600;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="toast" id="toast"></div>
+
+    <!-- SCREEN 1 — SPLASH -->
+    <div class="screen splash active" id="screen-1">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px;">
+        <div class="splash-title">Your Life.<br>Your AI.</div>
+        <div class="splash-sub">Who am I in the new reality?</div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2 — Three entries -->
+    <div class="screen" id="screen-2">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="content" style="display:flex; flex-direction:column; padding-top:48px;">
+        <h1 style="margin-bottom:10px;">Discover who you are in the new reality</h1>
+        <p style="margin-bottom:32px;">Interview with an AI consultant</p>
+
+        <div class="card card-dark" style="margin-bottom:14px; cursor:pointer;" onclick="navigate('screen-5')">
+          <div style="font-size:18px; font-weight:700; margin-bottom:6px;">Start interview</div>
+          <div style="font-size:13px; color:rgba(255,255,255,0.7);">Right now · ~40–60 min</div>
+        </div>
+
+        <div class="card" style="cursor:pointer;" onclick="navigate('screen-4')">
+          <div style="font-size:18px; font-weight:700; margin-bottom:6px;">Book a session</div>
+          <div style="font-size:13px; color:var(--grey);">Choose a convenient time</div>
+        </div>
+
+        <div class="anchor" onclick="navigate('screen-3')">
+          <div class="anchor-link">How it works and what you get →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3 — Product presentation -->
+    <div class="screen" id="screen-3">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div style="display:flex; align-items:center; padding:0 16px;">
+        <button class="back-btn" onclick="navigate('screen-2')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div style="flex:1;"></div>
+        <button class="back-btn" onclick="navigate('screen-2')" style="font-size:13px; color:var(--grey); width:auto; padding:0 8px;">Skip</button>
+      </div>
+
+      <div class="slides-container" id="slides">
+        <div class="slide">
+          <div style="flex:1;"></div>
+          <div class="slide-body" style="text-align:center;">
+            <div class="slide-title">Who can you become in a world where AI changes everything?</div>
+            <div class="slide-sub">We take your experience, skills and profession — and show you your new possibilities</div>
+          </div>
+          <div style="flex:1;"></div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-illustration">[ Illustration ]</div>
+          <div class="slide-body">
+            <div class="slide-title">Step 1. A conversation with an AI consultant</div>
+            <div class="slide-sub">Like a real interview. You talk about yourself — we listen, analyze your voice, speech patterns and study your experience</div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-illustration">[ Illustration ]</div>
+          <div class="slide-body">
+            <div class="slide-title">Step 2. You review everything we learned</div>
+            <div class="slide-sub">Every insight about you — you confirm or correct. You are always in control</div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-illustration">[ Illustration ]</div>
+          <div class="slide-body">
+            <div class="slide-title">Step 3. Your future scenarios</div>
+            <div class="slide-sub">Who you can become in the new reality — with probability percentage</div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <div style="flex:1;"></div>
+          <div class="slide-body" style="text-align:center; gap:24px;">
+            <div class="slide-title">Ready to find out who you are in the new reality?</div>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+              <button class="btn btn-primary btn-full" onclick="navigate('screen-5')">Start now</button>
+              <button class="btn btn-secondary btn-full" onclick="navigate('screen-4')">Book a session</button>
+            </div>
+          </div>
+          <div style="flex:1;"></div>
+        </div>
+      </div>
+
+      <div class="dots" id="slide-dots">
+        <span class="dot active" onclick="goToSlide(0)"></span>
+        <span class="dot" onclick="goToSlide(1)"></span>
+        <span class="dot" onclick="goToSlide(2)"></span>
+        <span class="dot" onclick="goToSlide(3)"></span>
+        <span class="dot" onclick="goToSlide(4)"></span>
+      </div>
+    </div>
+
+    <!-- SCREEN 4 — Schedule -->
+    <div class="screen" id="screen-4">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="content">
+        <div style="display:flex; align-items:center; padding:0 0 16px;">
+          <button class="back-btn" onclick="navigate('screen-2')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+
+        <h1 style="margin-bottom:8px;">When are you available?</h1>
+        <p>Interview ~40–60 min · can be split into sessions</p>
+
+        <div class="toggle">
+          <div class="toggle-opt active" data-mode="one" onclick="setScheduleMode('one')">One session · 40–60 min</div>
+          <div class="toggle-opt" data-mode="multi" onclick="setScheduleMode('multi')">Multiple sessions · choose length</div>
+        </div>
+
+        <!-- One session mode -->
+        <div id="mode-one">
+          <div class="picker-card">
+            <div class="picker-row" onclick="toggleDrum('drum-date')">
+              <span class="picker-label">Date</span>
+              <span class="picker-value" id="date-val">May 16, 2026</span>
+            </div>
+            <div class="picker-drum" id="drum-date">
+              <div class="drum">
+                <div class="drum-list" id="day-list"></div>
+              </div>
+              <div class="drum">
+                <div class="drum-list" id="mon-list"></div>
+              </div>
+              <div class="drum">
+                <div class="drum-list" id="yr-list"></div>
+              </div>
+            </div>
+            <div class="picker-row" onclick="toggleDrum('drum-time')">
+              <span class="picker-label">Time</span>
+              <span class="picker-value" id="time-val">14:00</span>
+            </div>
+            <div class="picker-drum" id="drum-time">
+              <div class="drum">
+                <div class="drum-list" id="hr-list"></div>
+              </div>
+              <div class="drum">
+                <div class="drum-list" id="min-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi session mode -->
+        <div id="mode-multi" style="display:none;">
+          <div style="font-size:13px; color:var(--grey); margin-bottom:8px; font-weight:500;">Session length</div>
+          <div class="pill-group">
+            <div class="pill active" data-len="10" onclick="setLen(10)">10 min</div>
+            <div class="pill" data-len="20" onclick="setLen(20)">20 min</div>
+          </div>
+          <div style="font-size:13px; color:var(--grey); margin-bottom:12px;" id="schedule-info">10 min selected → 5 sessions</div>
+
+          <div id="sessions-list"></div>
+        </div>
+
+        <div class="consultant-block">
+          <div class="avatar">A</div>
+          <div class="consultant-info">
+            <div class="consultant-name">Alex · AI Consultant</div>
+            <div class="consultant-role">AI career consultant</div>
+          </div>
+          <button class="btn btn-secondary btn-small" onclick="openConsultantModal()">Replace</button>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="book-btn" style="margin-top:24px;" onclick="confirmBooking()">Book session</button>
+      </div>
+
+      <!-- Modal: consultant avatar grid -->
+      <div class="modal-overlay" id="consultant-modal" onclick="if(event.target===this)closeConsultantModal()">
+        <div class="modal">
+          <h2 style="margin-bottom:6px;">Choose a consultant</h2>
+          <p style="font-size:13px;">Pick the AI consultant you'd like to talk with</p>
+          <div class="avatar-grid" id="avatar-grid"></div>
+          <button class="btn btn-primary btn-full" style="margin-top:24px;" onclick="confirmConsultant()">Confirm</button>
+        </div>
+      </div>
+
+      <!-- Permission modal: notifications -->
+      <div class="modal-overlay center" id="perm-notifications">
+        <div class="confirm-modal">
+          <h3>Allow Notifications?</h3>
+          <p>Your Life. Your AI. would like to send you notifications.</p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="proceedToCalendarPermission()">Allow</button>
+            <button class="btn btn-secondary" onclick="proceedToCalendarPermission()">Don't Allow</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permission modal: calendar -->
+      <div class="modal-overlay center" id="perm-calendar">
+        <div class="confirm-modal">
+          <h3>Allow Calendar Access?</h3>
+          <p>Your Life. Your AI. would like to access your Calendar.</p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="finishBookingFlow()">Allow</button>
+            <button class="btn btn-secondary" onclick="finishBookingFlow()">Don't Allow</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4b — Scheduled / waiting -->
+    <div class="screen" id="screen-4b">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="content">
+        <div style="display:flex; align-items:center; padding:0 0 16px;">
+          <button class="back-btn" onclick="navigate('screen-2')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+
+        <h1 style="margin-bottom:8px;">Your interview is scheduled</h1>
+        <p style="margin-bottom:24px;" id="scheduled-sub">May 16, 2026 · 14:00</p>
+
+        <div class="consultant-block" style="margin-top:0;">
+          <div class="avatar">A</div>
+          <div class="consultant-info">
+            <div class="consultant-name">Alex · AI Consultant</div>
+            <div class="consultant-role">AI career consultant</div>
+          </div>
+        </div>
+
+        <div id="sessions-summary" style="margin-top:20px;"></div>
+
+        <div style="margin-top:32px; display:flex; flex-direction:column; gap:10px;">
+          <button class="btn btn-primary btn-full" onclick="navigate('screen-5')">Start interview now</button>
+          <button class="btn btn-secondary btn-small" style="align-self:center; padding:8px 16px;" onclick="navigate('screen-4')">Reschedule</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 5 — Video call -->
+    <div class="screen call-screen" id="screen-5">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="session-label">Session 1 of 1</div>
+
+      <div class="question-pill">Tell me — how did you become a lawyer?</div>
+      <div class="question-progress">Question 4 of 18</div>
+
+      <div class="videos">
+        <div class="video-window speaking" id="vid-ai">
+          <div class="video-placeholder">[ Video ]</div>
+          <div class="label">
+            <span class="live-dot"></span>
+            Alex · AI Consultant
+          </div>
+        </div>
+        <div class="video-window" id="vid-you">
+          <div class="video-placeholder">[ Video ]</div>
+          <div class="label">You</div>
+        </div>
+      </div>
+
+      <div class="call-controls">
+        <button class="call-btn" id="mic-btn" onclick="toggleMic()" title="Mic">
+          <svg class="icon-lg icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+          <svg class="icon-lg icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+        </button>
+        <button class="call-btn muted" id="cam-btn" onclick="toggleCam()" title="Camera">
+          <svg class="icon-lg icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <svg class="icon-lg icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+        </button>
+        <button class="call-btn" id="pause-btn" onclick="togglePause()" title="Pause">
+          <svg class="icon-lg icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <svg class="icon-lg icon-off" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4 L19 12 L7 20 Z"/></svg>
+        </button>
+        <button class="call-btn stop" onclick="openStopConfirm()" title="Stop">
+          <svg class="icon-lg" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+        </button>
+      </div>
+
+      <!-- Stop confirmation modal -->
+      <div class="modal-overlay center" id="stop-confirm" onclick="if(event.target===this)closeStopConfirm()">
+        <div class="confirm-modal">
+          <h3>End the interview?</h3>
+          <p>Are you sure you want to end the interview?</p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="endInterview()">End interview</button>
+            <button class="btn btn-secondary" onclick="closeStopConfirm()">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 5b — Interview complete handoff -->
+    <div class="screen" id="screen-5b">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="content" style="display:flex; flex-direction:column; padding-top:24px;">
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+          <h1 style="font-size:32px; margin-bottom:10px;">Interview complete.</h1>
+          <p style="margin-bottom:32px;">Great conversation, Lyudmila.</p>
+
+          <div class="divider" style="margin:0 0 24px;"></div>
+
+          <h3 style="font-size:15px; font-weight:700; margin-bottom:18px;">What happens next:</h3>
+
+          <div class="next-step">
+            <div class="next-num">1</div>
+            <div class="next-text">We analyze everything you shared — your words, voice patterns and experience.</div>
+          </div>
+          <div class="next-step">
+            <div class="next-num">2</div>
+            <div class="next-text">You review 28 insights about yourself. Tap yes or no — takes about 5 minutes.</div>
+          </div>
+          <div class="next-step">
+            <div class="next-num">3</div>
+            <div class="next-text">Your personal scenarios are ready.</div>
+          </div>
+
+          <div class="small" style="margin-top:20px; color:var(--grey-light);">The more carefully you review, the more accurate your results.</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:12px; padding-top:24px;">
+          <button class="btn btn-primary btn-full" onclick="navigate('screen-6')">Start review</button>
+          <a class="small" style="text-align:center; color:var(--grey); cursor:pointer; text-decoration:underline; padding:6px;" onclick="openHandoffRetakeConfirm()">Retake interview</a>
+        </div>
+      </div>
+
+      <!-- Retake confirmation modal for the interview-complete handoff -->
+      <div class="modal-overlay center" id="handoff-retake-confirm" onclick="if(event.target===this)closeHandoffRetakeConfirm()">
+        <div class="confirm-modal">
+          <h3>Retake interview?</h3>
+          <p>Your current interview will not be saved. Are you sure you want to retake it?</p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="confirmHandoffRetake()">Retake</button>
+            <button class="btn btn-secondary" onclick="closeHandoffRetakeConfirm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 6 — Approval -->
+    <div class="screen" id="screen-6">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="content" style="display:flex; flex-direction:column; padding-bottom:16px;">
+        <h1 style="margin-bottom:6px;">Is this you?</h1>
+        <p style="margin-bottom:4px;">Swipe right — yes, swipe left — no</p>
+        <div class="small" id="card-progress">1 of 12</div>
+
+        <div class="swipe-stack" id="swipe-stack">
+          <!-- Back card (next) -->
+          <div class="swipe-card behind" id="swipe-card-back">
+            <div class="swipe-illustration">[ Illustration ]</div>
+            <div class="swipe-text" id="fact-text-back">You speak with structured, top-down reasoning.</div>
+          </div>
+          <!-- Front card (current) -->
+          <div class="swipe-card front" id="swipe-card">
+            <div class="tint yes" id="tint-yes"></div>
+            <div class="tint no" id="tint-no"></div>
+            <div class="swipe-illustration">[ Illustration ]</div>
+            <div class="swipe-text" id="fact-text">You have 20 years in law. Specialization — corporate law.</div>
+            <div class="confirm-state" id="confirm-state">
+              <div class="q">Is this correct now?</div>
+              <div class="actions">
+                <button class="btn btn-primary btn-small" onclick="acceptCorrection()">Yes</button>
+                <button class="btn btn-secondary btn-small" onclick="openClarify()">Clarify again</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="swipe-hints">
+          <span>← No</span>
+          <span>Yes →</span>
+        </div>
+
+        <button class="btn btn-secondary" style="align-self:center; margin-top:14px;" onclick="openClarify()">Clarify</button>
+      </div>
+
+      <div class="clarify-area" id="clarify-area">
+        <button class="icon-btn-circle" title="Cancel" onclick="cancelClarify()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <input class="clarify-input" id="clarify-input" placeholder="Add a clarification…">
+        <button class="icon-btn-circle" title="Voice">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        </button>
+        <button class="btn btn-primary btn-small" onclick="sendClarify()">Send</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 6b — Loading -->
+    <div class="screen loading-screen" id="screen-loading">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">Analyzing your profile…</div>
+      </div>
+    </div>
+
+    <!-- SCREEN 7 — Results -->
+    <div class="screen" id="screen-7">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="content">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0 16px;">
+          <div style="width:36px;"></div>
+          <h3 style="font-size:14px; font-weight:600;">Your results</h3>
+          <button class="back-btn" onclick="navigate('screen-9')" title="Profile">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+          </button>
+        </div>
+
+        <h1 style="margin-bottom:8px;">Your new reality</h1>
+        <p style="margin-bottom:24px;">Based on your experience and analysis</p>
+
+        <div class="scenario-card first" onclick="navigate('screen-8')">
+          <div class="scenario-head">
+            <div class="scenario-name">AI-assisted Lawyer</div>
+            <div class="scenario-pct">87%</div>
+          </div>
+          <div class="chips-label">Your matching skills:</div>
+          <div class="chips">
+            <span class="chip">Corporate law</span>
+            <span class="chip">Negotiation</span>
+            <span class="chip">Analytical thinking</span>
+          </div>
+          <div class="indicators">
+            <div class="indicator">
+              <div class="indicator-label">Passion for work</div>
+              <div class="bar"><div class="bar-fill" style="width:85%"></div></div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Income potential</div>
+              <div class="indicator-value">$120,000–180,000/yr</div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Entry difficulty</div>
+              <div class="bar"><div class="bar-fill" style="width:35%"></div></div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Growth speed</div>
+              <div class="indicator-value">6–12 months</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card second" onclick="navigate('screen-8')">
+          <div class="scenario-head">
+            <div class="scenario-name">Legal AI Product Manager</div>
+            <div class="scenario-pct">72%</div>
+          </div>
+          <div class="chips-label">Your matching skills:</div>
+          <div class="chips">
+            <span class="chip">Strategy</span>
+            <span class="chip">Communication</span>
+          </div>
+          <div class="indicators">
+            <div class="indicator">
+              <div class="indicator-label">Passion for work</div>
+              <div class="bar"><div class="bar-fill" style="width:70%"></div></div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Income potential</div>
+              <div class="indicator-value">$140,000–220,000/yr</div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Entry difficulty</div>
+              <div class="bar"><div class="bar-fill" style="width:60%"></div></div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Growth speed</div>
+              <div class="indicator-value">12–18 months</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card third" onclick="navigate('screen-8')">
+          <div class="scenario-head">
+            <div class="scenario-name">Compliance & Ethics Lead</div>
+            <div class="scenario-pct">64%</div>
+          </div>
+          <div class="chips-label">Your matching skills:</div>
+          <div class="chips">
+            <span class="chip">Ethics</span>
+            <span class="chip">Policy</span>
+          </div>
+          <div class="indicators">
+            <div class="indicator">
+              <div class="indicator-label">Passion for work</div>
+              <div class="bar"><div class="bar-fill" style="width:55%"></div></div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Income potential</div>
+              <div class="indicator-value">$110,000–160,000/yr</div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Entry difficulty</div>
+              <div class="bar"><div class="bar-fill" style="width:45%"></div></div>
+            </div>
+            <div class="indicator">
+              <div class="indicator-label">Growth speed</div>
+              <div class="indicator-value">9–15 months</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center; padding:24px 0 12px;">
+          <a class="small" style="color:var(--grey); cursor:pointer; text-decoration:underline;" onclick="navigate('screen-5')">Not satisfied with the results? Retake the interview →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 8 — Detail -->
+    <div class="screen" id="screen-8">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="content">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0;">
+          <button class="back-btn" onclick="navigate('screen-7')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="back-btn" onclick="navigate('screen-9')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+          </button>
+        </div>
+
+        <div class="detail-head">
+          <h1>AI-assisted Lawyer</h1>
+          <div class="detail-pct">87%</div>
+        </div>
+
+        <div class="section">
+          <h3>Why this fits you</h3>
+          <div class="bullet-list">
+            <div class="bullet">20 years of corporate law practice — a foundation AI can't replicate</div>
+            <div class="bullet">Sharp analytical thinking — your speech patterns show structured reasoning</div>
+            <div class="bullet">Strong client communication — confirmed by your interview</div>
+            <div class="bullet">High comfort with ambiguity — typical of senior legal minds</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>What changes in your profession</h3>
+          <div class="change-graph">
+            <div class="change-circle">
+              <div class="change-label">Automated</div>
+              <div class="change-pct">60%</div>
+              <div class="change-tags">
+                <span class="change-tag">Drafting</span>
+                <span class="change-tag">Research</span>
+              </div>
+            </div>
+            <div class="change-arrow">→</div>
+            <div class="change-circle dark">
+              <div class="change-label">Stays with you</div>
+              <div class="change-pct">40%</div>
+              <div class="change-tags">
+                <span class="change-tag">Strategy</span>
+                <span class="change-tag">Judgment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Indicators</h3>
+          <div class="indicator-block">
+            <div class="ind-label">Passion for work</div>
+            <div class="bar"><div class="bar-fill" style="width:85%"></div></div>
+            <div class="ind-desc">Based on the energy in your voice when discussing case strategy</div>
+          </div>
+          <div class="indicator-block">
+            <div class="ind-label">Income potential</div>
+            <div class="big-number">$120,000–180,000/yr</div>
+            <div class="ind-desc">Senior level, US market, 2026</div>
+          </div>
+          <div class="indicator-block">
+            <div class="ind-label">Entry difficulty</div>
+            <div class="bar"><div class="bar-fill" style="width:35%"></div></div>
+            <div class="ind-desc">Low — leverages your existing background</div>
+          </div>
+          <div class="indicator-block">
+            <div class="ind-label">Growth speed</div>
+            <div class="timeline">
+              <div class="timeline-line"></div>
+              <div class="timeline-dots">
+                <div class="timeline-dot active" onclick="selectMilestone(0)">
+                  <div class="circle"></div>
+                  <div class="lbl">Now</div>
+                </div>
+                <div class="timeline-dot" onclick="selectMilestone(1)">
+                  <div class="circle"></div>
+                  <div class="lbl">6 months</div>
+                </div>
+                <div class="timeline-dot" onclick="selectMilestone(2)">
+                  <div class="circle"></div>
+                  <div class="lbl">1 year</div>
+                </div>
+              </div>
+              <div class="milestone-card open" id="milestone-card">Start: take an AI-for-legal foundations course and start using an AI drafting tool on small matters.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Skills radar</h3>
+          <div class="radar-wrap">
+            <svg class="radar-svg" viewBox="-150 -150 300 300" id="radar-svg"></svg>
+          </div>
+          <div class="radar-legend">
+            <div class="key"><span class="sq filled"></span>You have</div>
+            <div class="key"><span class="sq dashed"></span>You need</div>
+          </div>
+          <div class="tooltip" id="radar-tip"></div>
+        </div>
+
+        <div class="section">
+          <h3>Market growth</h3>
+          <div class="chart" id="market-chart">
+            <div class="chart-bar-wrap" onclick="showChartTip(0)">
+              <div class="chart-value">$12B</div>
+              <div class="chart-bar" style="height:50px"></div>
+              <div class="chart-label">2024</div>
+            </div>
+            <div class="chart-bar-wrap" onclick="showChartTip(1)">
+              <div class="chart-value">$24B</div>
+              <div class="chart-bar" style="height:100px"></div>
+              <div class="chart-label">2025</div>
+            </div>
+            <div class="chart-bar-wrap" onclick="showChartTip(2)">
+              <div class="chart-value">$41B</div>
+              <div class="chart-bar" style="height:170px"></div>
+              <div class="chart-label">2026</div>
+            </div>
+          </div>
+          <div class="tooltip" id="chart-tip"></div>
+        </div>
+
+        <div class="section">
+          <h3>First step</h3>
+          <div class="first-step">
+            <div class="first-step-label">Start here:</div>
+            <div class="first-step-text">Sign up for a 4-week "AI for legal professionals" certificate. Apply what you learn to one active matter this month.</div>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <button class="btn btn-secondary btn-small" onclick="showToast('Saved to your profile')">Save</button>
+          <button class="btn btn-secondary btn-small" onclick="openShareSheet()">Share</button>
+        </div>
+
+        <button class="btn btn-primary btn-full" style="margin-top:14px;" onclick="openFirstStepSheet()">Start your first step →</button>
+      </div>
+
+      <!-- Share sheet (iOS-style) -->
+      <div class="modal-overlay" id="share-sheet" onclick="if(event.target===this)closeShareSheet()">
+        <div class="modal share-modal">
+          <div class="share-header">
+            <div>
+              <div style="font-size:13px; color:var(--grey);">Share</div>
+              <div style="font-size:15px; font-weight:600;">AI-assisted Lawyer · 87%</div>
+            </div>
+            <button class="back-btn" onclick="closeShareSheet()">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="share-apps">
+            <div class="share-app"><div class="share-icon">M</div><div class="share-name">Messages</div></div>
+            <div class="share-app"><div class="share-icon">@</div><div class="share-name">Mail</div></div>
+            <div class="share-app"><div class="share-icon">W</div><div class="share-name">WhatsApp</div></div>
+            <div class="share-app"><div class="share-icon">T</div><div class="share-name">Telegram</div></div>
+            <div class="share-app"><div class="share-icon">N</div><div class="share-name">Notes</div></div>
+          </div>
+          <div class="share-actions">
+            <div class="share-row"><span>Copy Link</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div>
+            <div class="share-row"><span>Save to Files</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+            <div class="share-row"><span>Print</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- First step plan bottom sheet -->
+      <div class="modal-overlay" id="first-step-sheet" onclick="if(event.target===this)closeFirstStepSheet()">
+        <div class="modal" style="max-height:85%; overflow-y:auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h2>Your first step plan</h2>
+            <button class="back-btn" onclick="closeFirstStepSheet()">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <p style="margin-bottom:20px;">A curated set of actions, resources and community to start with this week.</p>
+
+          <div class="plan-group">
+            <div class="plan-label">Actions</div>
+            <div class="plan-card">
+              <div>
+                <div class="plan-title">Enroll: AI for Legal Professionals</div>
+                <div class="plan-meta">4-week certificate · ~3 hr/week</div>
+              </div>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="plan-card">
+              <div>
+                <div class="plan-title">Pilot AI on one current matter</div>
+                <div class="plan-meta">Start small · low risk</div>
+              </div>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+
+          <div class="plan-group">
+            <div class="plan-label">Resources</div>
+            <div class="plan-card">
+              <div>
+                <div class="plan-title">Reading: "AI in the Practice of Law"</div>
+                <div class="plan-meta">2024 · Harvard Law Review</div>
+              </div>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="plan-card">
+              <div>
+                <div class="plan-title">Try: Harvey AI free tier</div>
+                <div class="plan-meta">Legal research copilot</div>
+              </div>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+
+          <div class="plan-group">
+            <div class="plan-label">Community</div>
+            <div class="plan-card">
+              <div>
+                <div class="plan-title">Join: Legal AI Practitioners Slack</div>
+                <div class="plan-meta">~3,200 members</div>
+              </div>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="plan-card">
+              <div>
+                <div class="plan-title">Attend: AI &amp; Law monthly meetup</div>
+                <div class="plan-meta">Virtual · first Tuesday</div>
+              </div>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="closeFirstStepSheet()">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 9 — Profile -->
+    <div class="screen" id="screen-9">
+      <div class="status-bar"><span>9:41</span><span class="right"><svg viewBox="0 0 16 12" fill="currentColor" aria-label="Cellular"><rect x="0" y="8.5" width="2.5" height="3.5" rx="0.4"/><rect x="4" y="6" width="2.5" height="6" rx="0.4"/><rect x="8" y="3" width="2.5" height="9" rx="0.4"/><rect x="12" y="0" width="2.5" height="12" rx="0.4"/></svg><svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-label="Wi-Fi"><path d="M1.5 4.5 Q8 -1.5 14.5 4.5"/><path d="M3.8 7 Q8 3 12.2 7"/><path d="M6 9.5 Q8 7.5 10 9.5"/><circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none"/></svg><svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="1" aria-label="Battery"><rect x="0.5" y="1" width="20" height="10" rx="2.5"/><rect x="2" y="2.5" width="15" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="21.5" y="4" width="2" height="4" rx="0.8" fill="currentColor" stroke="none"/></svg></span></div>
+      <div class="content">
+        <div class="header-row">
+          <button class="back-btn" onclick="navigate('screen-8')">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <h1>My Profile</h1>
+          <div style="width:36px;"></div>
+        </div>
+
+        <div class="profile-top">
+          <div class="avatar-upload" onclick="openPhotoPicker()">
+            <div class="avatar avatar-lg">L</div>
+            <div class="avatar-camera">
+              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+          </div>
+          <div class="profile-name">Lyudmila</div>
+          <div class="profile-status">Interview completed · May 14, 2025</div>
+          <div class="profile-actions">
+            <button class="btn btn-secondary btn-small" onclick="openUpdateSheet()">Update profile</button>
+            <button class="btn btn-secondary btn-small" onclick="openRetakeConfirm()">Retake interview</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-header">
+          <div class="section-title">My profile</div>
+          <div class="section-link" id="edit-link" onclick="toggleEditMode()">Edit</div>
+        </div>
+
+        <div class="profile-cat">
+          <div class="cat-label">Professional path</div>
+          <div class="cat-text collapsed" id="cat1">Corporate lawyer with 20 years of experience. Led legal teams at two mid-sized firms before going independent in 2018. Specializes in cross-border M&amp;A and IP strategy for tech founders. Known for distilling complex regulatory landscapes into clear, actionable advice for non-legal stakeholders.</div>
+          <textarea class="cat-edit" id="cat1-edit" rows="4" style="display:none;">Corporate lawyer with 20 years of experience. Led legal teams at two mid-sized firms before going independent in 2018. Specializes in cross-border M&amp;A and IP strategy for tech founders. Known for distilling complex regulatory landscapes into clear, actionable advice for non-legal stakeholders.</textarea>
+        </div>
+        <div class="profile-cat">
+          <div class="cat-label">Strengths</div>
+          <div class="cat-text collapsed" id="cat2">Analytical thinking under pressure, structured argumentation, and rapid context-switching between unrelated cases. Comfortable challenging senior executives when facts demand it. Strong written communication — drafts that read clean on first pass.</div>
+          <textarea class="cat-edit" id="cat2-edit" rows="4" style="display:none;">Analytical thinking under pressure, structured argumentation, and rapid context-switching between unrelated cases. Comfortable challenging senior executives when facts demand it. Strong written communication — drafts that read clean on first pass.</textarea>
+        </div>
+        <div class="profile-cat">
+          <div class="cat-label">Thinking style</div>
+          <div class="cat-text collapsed" id="cat3">Top-down reasoner who starts from outcomes and reverse-engineers steps. Prefers depth over breadth on any given topic. Skeptical of consensus until evidence holds. Quietly observes before contributing in group settings.</div>
+          <textarea class="cat-edit" id="cat3-edit" rows="4" style="display:none;">Top-down reasoner who starts from outcomes and reverse-engineers steps. Prefers depth over breadth on any given topic. Skeptical of consensus until evidence holds. Quietly observes before contributing in group settings.</textarea>
+        </div>
+        <div class="section-link" id="show-more-link" style="display:inline-block;" onclick="toggleShowMore(this)">Show more</div>
+        <div id="edit-actions" style="display:none; gap:8px; margin-top:12px;">
+          <button class="btn btn-primary btn-small" onclick="saveEdits()">Save</button>
+          <button class="btn btn-secondary btn-small" onclick="cancelEdits()">Cancel</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-header">
+          <div class="section-title">My data</div>
+        </div>
+
+        <div id="data-list"></div>
+
+        <div class="divider"></div>
+
+        <div class="section-header">
+          <div class="section-title">My scenarios</div>
+        </div>
+
+        <div class="mini-grid">
+          <div class="mini-card" onclick="navigate('screen-8')">
+            <div class="name">AI-assisted Lawyer</div>
+            <div class="pct">87%</div>
+            <div class="chips">
+              <span class="chip">Corporate</span>
+              <span class="chip">Strategy</span>
+            </div>
+          </div>
+          <div class="mini-card" onclick="navigate('screen-8')">
+            <div class="name">Legal AI PM</div>
+            <div class="pct">72%</div>
+            <div class="chips">
+              <span class="chip">Product</span>
+              <span class="chip">Strategy</span>
+            </div>
+          </div>
+          <div class="mini-card" onclick="navigate('screen-8')">
+            <div class="name">Compliance Lead</div>
+            <div class="pct">64%</div>
+            <div class="chips">
+              <span class="chip">Ethics</span>
+              <span class="chip">Policy</span>
+            </div>
+          </div>
+          <div class="mini-card" onclick="navigate('screen-8')">
+            <div class="name">Legal Educator</div>
+            <div class="pct">58%</div>
+            <div class="chips">
+              <span class="chip">Teaching</span>
+              <span class="chip">Writing</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="delete-link">Delete profile</div>
+      </div>
+
+      <!-- Update profile bottom sheet -->
+      <div class="modal-overlay" id="update-sheet" onclick="if(event.target===this)closeUpdateSheet()">
+        <div class="modal">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h2>Update profile</h2>
+            <button class="back-btn" onclick="closeUpdateSheet()">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <p style="margin-bottom:20px;">Add new information to refine your scenarios.</p>
+
+          <div class="plan-card" onclick="pickDocuments()">
+            <div>
+              <div class="plan-title">Add documents</div>
+              <div class="plan-meta">CV, portfolio, contracts</div>
+            </div>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+
+          <div class="plan-card" onclick="openAddContext()">
+            <div>
+              <div class="plan-title">Add context</div>
+              <div class="plan-meta">Type or speak new details</div>
+            </div>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+
+          <!-- Add context inline panel -->
+          <div id="add-context-panel" style="display:none; margin-top:16px;">
+            <div style="display:flex; gap:8px; align-items:flex-start;">
+              <textarea id="context-input" rows="3" placeholder="Tell us what's new…" style="flex:1; background:var(--bg2); border:1px solid var(--divider); border-radius:12px; padding:12px; font-family:inherit; font-size:14px; outline:none; resize:none;"></textarea>
+              <button class="icon-btn-circle" title="Voice input">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+              </button>
+            </div>
+            <button class="btn btn-primary btn-full" style="margin-top:10px;" onclick="submitContext()">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photo picker (iOS action sheet style) -->
+      <div class="modal-overlay" id="photo-picker" onclick="if(event.target===this)closePhotoPicker()">
+        <div class="modal">
+          <h3 style="text-align:center; margin-bottom:16px;">Change photo</h3>
+          <div class="plan-card" onclick="pickPhoto('camera')">
+            <div><div class="plan-title">Take Photo</div></div>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="plan-card" onclick="pickPhoto('library')">
+            <div><div class="plan-title">Choose from Library</div></div>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <button class="btn btn-secondary btn-full" style="margin-top:12px;" onclick="closePhotoPicker()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Retake confirmation modal -->
+      <div class="modal-overlay center" id="retake-confirm" onclick="if(event.target===this)closeRetakeConfirm()">
+        <div class="confirm-modal">
+          <h3>Retake interview?</h3>
+          <p>Are you sure? Your current results will be replaced.</p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="confirmRetake()">Retake</button>
+            <button class="btn btn-secondary" onclick="closeRetakeConfirm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data delete confirmation modal -->
+      <div class="modal-overlay center" id="data-delete-confirm" onclick="if(event.target===this)cancelDataDelete()">
+        <div class="confirm-modal">
+          <h3>Delete this data?</h3>
+          <p id="data-delete-msg">This data will be removed from your profile.</p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="confirmDataDelete()">Delete</button>
+            <button class="btn btn-secondary" onclick="cancelDataDelete()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data detail bottom sheet -->
+      <div class="modal-overlay" id="data-detail" onclick="if(event.target===this)closeDataDetail()">
+        <div class="modal">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h2 id="data-detail-title">Voice analysis</h2>
+            <button class="back-btn" onclick="closeDataDetail()">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <p id="data-detail-meta" style="margin-bottom:18px;">Tone · pace · sentiment</p>
+          <div id="data-detail-files"></div>
+          <button class="btn btn-primary btn-full" style="margin-top:20px;" onclick="closeDataDetail()">Done</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nav-hint">
+    Jump to:
+    <a onclick="navigate('screen-1')">1 Splash</a> ·
+    <a onclick="navigate('screen-2')">2 Entry</a> ·
+    <a onclick="navigate('screen-3')">3 Slides</a> ·
+    <a onclick="navigate('screen-4')">4 Schedule</a> ·
+    <a onclick="navigate('screen-4b')">4b Scheduled</a> ·
+    <a onclick="navigate('screen-5')">5 Call</a> ·
+    <a onclick="navigate('screen-5b')">5b Done</a> ·
+    <a onclick="navigate('screen-6')">6 Approval</a> ·
+    <a onclick="navigate('screen-7')">7 Results</a> ·
+    <a onclick="navigate('screen-8')">8 Detail</a> ·
+    <a onclick="navigate('screen-9')">9 Profile</a>
+  </div>
+</div>
+
+<script>
+// ============ Navigation ============
+const navHistory = [];
+
+// Pure screen-switching primitive — hide current active screen, show target.
+// Used by both forward navigation (navigate) and back navigation (goBack).
+function switchScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) {
+    target.classList.add('active');
+    target.scrollTop = 0;
+  }
+}
+
+// Forward navigation — records the current active screen to history before switching.
+function navigate(id) {
+  const current = document.querySelector('.screen.active')?.id;
+  if (current && current !== id) navHistory.push(current);
+  switchScreen(id);
+  // Reset screen-6 state every time it becomes visible — so a retake (or any
+  // re-entry) always starts cleanly at card 1 instead of resuming mid-way.
+  if (id === 'screen-6') {
+    acceptedCount = 0;
+    factIdx = 0;
+    document.getElementById('card-progress').textContent = `1 of ${totalCards}`;
+    // Front card → default visual state
+    card.style.transform = '';
+    card.style.opacity = '';
+    card.style.pointerEvents = '';
+    // Restore card texts to the first two facts and put the back card behind
+    document.getElementById('fact-text').textContent = facts[0];
+    document.getElementById('fact-text-back').textContent = facts[1 % facts.length];
+    cardBack.classList.remove('front', 'rising');
+    cardBack.classList.add('behind');
+    cardBack.style.transform = '';
+    cardBack.style.opacity = '';
+  }
+}
+
+// Auto-advance splash → screen 2
+setTimeout(() => {
+  if (document.getElementById('screen-1').classList.contains('active')) {
+    navigate('screen-2');
+  }
+}, 2000);
+
+// ============ Screen 3 — slide navigation ============
+const slideEls = document.querySelectorAll('#slides .slide'); const dotsEls = document.querySelectorAll('#slide-dots .dot'); let currentIdx = 0; function goToSlide(idx) { currentIdx = Math.max(0, Math.min(4, idx)); slideEls.forEach((s, i) => s.classList.toggle('active-slide', i === currentIdx)); dotsEls.forEach((d, i) => d.classList.toggle('active', i === currentIdx)); } goToSlide(0); let _tx = 0; document.getElementById('slides').addEventListener('touchstart', e => { _tx = e.changedTouches[0].clientX; }, { passive: true }); document.getElementById('slides').addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - _tx; if (Math.abs(dx) > 50) goToSlide(currentIdx + (dx < 0 ? 1 : -1)); }, { passive: true });
+
+// ============ Screen 4 — schedule ============
+const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function buildDrum(listId, range, initialIdx, formatter) {
+  const list = document.getElementById(listId);
+  list.innerHTML = '';
+  range.forEach((v, i) => {
+    const it = document.createElement('div');
+    it.className = 'drum-item' + (i === initialIdx ? ' selected' : '');
+    it.textContent = formatter ? formatter(v) : v;
+    it.dataset.val = v;
+    list.appendChild(it);
+  });
+  list.scrollTop = initialIdx * 32;
+  list.addEventListener('scroll', () => {
+    const idx = Math.round(list.scrollTop / 32);
+    [...list.children].forEach((c, i) => c.classList.toggle('selected', i === idx));
+    updateDateTime();
+  });
+}
+
+buildDrum('day-list', Array.from({length:31}, (_,i)=>i+1), 15);
+buildDrum('mon-list', monthNames, 4);
+buildDrum('yr-list', [2026,2027,2028], 0);
+buildDrum('hr-list', Array.from({length:24}, (_,i)=>String(i).padStart(2,'0')), 14);
+buildDrum('min-list', ['00','15','30','45'], 0);
+
+function updateDateTime() {
+  const day = document.querySelector('#day-list .selected')?.dataset.val || '16';
+  const mon = document.querySelector('#mon-list .selected')?.dataset.val || 'May';
+  const yr = document.querySelector('#yr-list .selected')?.dataset.val || '2026';
+  const hr = document.querySelector('#hr-list .selected')?.dataset.val || '14';
+  const mn = document.querySelector('#min-list .selected')?.dataset.val || '00';
+  document.getElementById('date-val').textContent = `${mon} ${day}, ${yr}`;
+  document.getElementById('time-val').textContent = `${hr}:${mn}`;
+  document.getElementById('scheduled-sub').textContent = `${mon} ${day}, ${yr} · ${hr}:${mn}`;
+}
+
+function toggleDrum(id) {
+  const el = document.getElementById(id);
+  document.querySelectorAll('.picker-drum').forEach(d => d !== el && d.classList.remove('open'));
+  el.classList.toggle('open');
+}
+
+let scheduleMode = 'one';
+
+function setScheduleMode(mode) {
+  scheduleMode = mode;
+  document.querySelectorAll('.toggle-opt').forEach(o => o.classList.toggle('active', o.dataset.mode === mode));
+  document.getElementById('mode-one').style.display = mode === 'one' ? '' : 'none';
+  document.getElementById('mode-multi').style.display = mode === 'multi' ? '' : 'none';
+  if (mode === 'multi') renderSessions();
+  updateBookButton();
+}
+
+let sessionLen = 10;
+let filledSessions = [];
+
+function setLen(len) {
+  sessionLen = len;
+  document.querySelectorAll('[data-len]').forEach(p => p.classList.toggle('active', parseInt(p.dataset.len) === len));
+  const count = len === 10 ? 5 : 3;
+  document.getElementById('schedule-info').textContent = `${len} min selected → ${count} sessions`;
+  filledSessions = [];
+  renderSessions();
+  updateBookButton();
+}
+
+function updateBookButton() {
+  const btn = document.getElementById('book-btn');
+  if (!btn) return;
+  let enabled;
+  if (scheduleMode === 'one') {
+    enabled = true; // single picker has a default value
+  } else {
+    const required = sessionLen === 10 ? 5 : 3;
+    enabled = filledSessions.length === required;
+  }
+  if (enabled) {
+    btn.style.opacity = '';
+    btn.style.pointerEvents = '';
+  } else {
+    btn.style.opacity = '0.4';
+    btn.style.pointerEvents = 'none';
+  }
+}
+
+let pickingIdx = null; // index of session whose picker is currently open
+
+function renderSessions() {
+  const count = sessionLen === 10 ? 5 : 3;
+  const list = document.getElementById('sessions-list');
+  list.innerHTML = '';
+  updateBookButton();
+  // show filled
+  filledSessions.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'session-row';
+    row.innerHTML = `<div class="session-num">${i+1}</div><div style="flex:1;">${s}</div><span class="pill pill-grey">Filled</span>`;
+    list.appendChild(row);
+  });
+  // show next picker
+  if (filledSessions.length < count) {
+    const i = filledSessions.length;
+    const row = document.createElement('div');
+    row.className = 'session-row';
+    row.style.flexDirection = 'column';
+    row.style.alignItems = 'stretch';
+    row.style.gap = '0';
+    row.style.padding = '0';
+    row.style.overflow = 'hidden';
+    row.innerHTML = `
+      <div style="display:flex; align-items:center; gap:12px; padding:14px 16px;">
+        <div class="session-num">${i+1}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px; color:var(--grey);">Pick date and time</div>
+        </div>
+        <button class="btn btn-secondary btn-small" onclick="openSessionPicker(${i})">${pickingIdx === i ? 'Cancel' : 'Set'}</button>
+      </div>
+    `;
+    list.appendChild(row);
+
+    if (pickingIdx === i) {
+      const pickerEl = document.createElement('div');
+      pickerEl.style.borderTop = '1px solid var(--divider)';
+      pickerEl.style.background = 'var(--bg2)';
+      pickerEl.style.padding = '16px';
+      pickerEl.innerHTML = `
+        <div style="display:flex; justify-content:center; gap:12px; margin-bottom:14px;">
+          <div class="drum"><div class="drum-list" id="s-day-list"></div></div>
+          <div class="drum"><div class="drum-list" id="s-mon-list"></div></div>
+          <div class="drum"><div class="drum-list" id="s-yr-list"></div></div>
+          <div class="drum"><div class="drum-list" id="s-hr-list"></div></div>
+          <div class="drum"><div class="drum-list" id="s-min-list"></div></div>
+        </div>
+        <button class="btn btn-primary btn-small btn-full" onclick="confirmSessionPick(${i})">Confirm</button>
+      `;
+      row.appendChild(pickerEl);
+      // Build drums (re-using same helper)
+      buildDrum('s-day-list', Array.from({length:31}, (_,k)=>k+1), 15 + i);
+      buildDrum('s-mon-list', monthNames, 4);
+      buildDrum('s-yr-list', [2026,2027,2028], 0);
+      buildDrum('s-hr-list', Array.from({length:24}, (_,k)=>String(k).padStart(2,'0')), 14);
+      buildDrum('s-min-list', ['00','15','30','45'], 0);
+    }
+  }
+}
+
+function openSessionPicker(i) {
+  pickingIdx = (pickingIdx === i) ? null : i;
+  renderSessions();
+}
+
+function confirmSessionPick(i) {
+  const day = document.querySelector('#s-day-list .selected')?.dataset.val || '16';
+  const mon = document.querySelector('#s-mon-list .selected')?.dataset.val || 'May';
+  const hr = document.querySelector('#s-hr-list .selected')?.dataset.val || '14';
+  const mn = document.querySelector('#s-min-list .selected')?.dataset.val || '00';
+  filledSessions.push(`${mon} ${day}, ${hr}:${mn}`);
+  pickingIdx = null;
+  renderSessions();
+  updateSessionsSummary();
+  updateBookButton();
+}
+
+function updateSessionsSummary() {
+  const sum = document.getElementById('sessions-summary');
+  if (filledSessions.length === 0) { sum.innerHTML = ''; return; }
+  sum.innerHTML = '<div style="font-size:13px; font-weight:600; margin-bottom:10px;">Sessions</div>';
+  filledSessions.forEach((s, i) => {
+    sum.innerHTML += `<div class="session-row"><div class="session-num">${i+1}</div><div style="flex:1;">${s}</div><span class="pill pill-grey">Upcoming</span></div>`;
+  });
+}
+
+function confirmBooking() {
+  // Custom modal flow simulating iOS native permission prompts.
+  // Step 1: notifications prompt. Both buttons advance to step 2.
+  // Step 2: calendar prompt. Both buttons finalize the booking.
+  document.getElementById('perm-notifications').classList.add('open');
+}
+
+function proceedToCalendarPermission() {
+  document.getElementById('perm-notifications').classList.remove('open');
+  document.getElementById('perm-calendar').classList.add('open');
+}
+
+function finishBookingFlow() {
+  document.getElementById('perm-calendar').classList.remove('open');
+  updateSessionsSummary();
+  navigate('screen-4b');
+}
+
+// Consultant modal
+const consultants = ['Alex','Maya','Noor','Kai','Jin','Eli','Sage','Ren'];
+function openConsultantModal() {
+  const grid = document.getElementById('avatar-grid');
+  grid.innerHTML = '';
+  consultants.forEach((n, i) => {
+    const o = document.createElement('div');
+    o.className = 'avatar-option' + (i === 0 ? ' selected' : '');
+    o.innerHTML = `<div class="avatar">${n[0]}</div><div class="name">${n}</div>`;
+    o.onclick = () => {
+      grid.querySelectorAll('.avatar-option').forEach(x => x.classList.remove('selected'));
+      o.classList.add('selected');
+      o.dataset.choice = n;
+    };
+    grid.appendChild(o);
+  });
+  document.getElementById('consultant-modal').classList.add('open');
+}
+function closeConsultantModal() {
+  document.getElementById('consultant-modal').classList.remove('open');
+}
+function confirmConsultant() {
+  const sel = document.querySelector('.avatar-option.selected .name')?.textContent || 'Alex';
+  document.querySelectorAll('.consultant-name').forEach(el => el.textContent = `${sel} · AI Consultant`);
+  document.querySelectorAll('#screen-4 .avatar, #screen-4b .avatar').forEach(a => a.textContent = sel[0]);
+  document.querySelector('#vid-ai .label').innerHTML = `<span class="live-dot"></span>${sel} · AI Consultant`;
+  closeConsultantModal();
+}
+
+// ============ Screen 5 — call controls ============
+function toggleMic() {
+  document.getElementById('mic-btn').classList.toggle('muted');
+}
+function toggleCam() {
+  document.getElementById('cam-btn').classList.toggle('muted');
+}
+function togglePause() {
+  document.getElementById('pause-btn').classList.toggle('paused');
+}
+function openStopConfirm() {
+  document.getElementById('stop-confirm').classList.add('open');
+}
+function closeStopConfirm() {
+  document.getElementById('stop-confirm').classList.remove('open');
+}
+function endInterview() {
+  closeStopConfirm();
+  navigate('screen-5b');
+}
+function openHandoffRetakeConfirm() {
+  document.getElementById('handoff-retake-confirm').classList.add('open');
+}
+function closeHandoffRetakeConfirm() {
+  document.getElementById('handoff-retake-confirm').classList.remove('open');
+}
+function confirmHandoffRetake() {
+  closeHandoffRetakeConfirm();
+  navigate('screen-5');
+}
+// Alternate speaking highlight
+setInterval(() => {
+  if (!document.getElementById('screen-5').classList.contains('active')) return;
+  document.getElementById('vid-ai').classList.toggle('speaking');
+  document.getElementById('vid-you').classList.toggle('speaking');
+}, 3500);
+
+// ============ Screen 6 — Swipe cards (stack) ============
+const facts = [
+  'You have 20 years in law. Specialization — corporate law.',
+  'You speak with structured, top-down reasoning.',
+  'You feel most energized when negotiating high-stakes deals.',
+  'You prefer working independently rather than in large teams.',
+  'You are comfortable challenging senior executives.',
+  'You enjoy mentoring junior colleagues more than you realize.',
+];
+let factIdx = 0;
+let totalCards = 12;
+let acceptedCount = 0;
+
+const card = document.getElementById('swipe-card');
+const cardBack = document.getElementById('swipe-card-back');
+const tintYes = document.getElementById('tint-yes');
+const tintNo = document.getElementById('tint-no');
+let dragging = false, startX = 0, dx = 0;
+
+function setCardTransform(x) {
+  const rot = x / 20;
+  card.style.transform = `translateX(${x}px) rotate(${rot}deg)`;
+  tintYes.style.opacity = Math.max(0, x / 120);
+  tintNo.style.opacity = Math.max(0, -x / 120);
+  // Back card scales up slightly as front is dragged
+  const progress = Math.min(1, Math.abs(x) / 150);
+  const scale = 0.94 + progress * 0.06;
+  const ty = 12 - progress * 12;
+  const op = 0.7 + progress * 0.3;
+  cardBack.style.transform = `scale(${scale}) translateY(${ty}px)`;
+  cardBack.style.opacity = op;
+}
+
+card.addEventListener('pointerdown', (e) => {
+  if (document.getElementById('confirm-state').classList.contains('open')) return;
+  if (document.getElementById('clarify-area').classList.contains('open')) return;
+  dragging = true; startX = e.clientX; dx = 0;
+  card.classList.add('dragging');
+  cardBack.style.transition = 'none';
+  card.setPointerCapture(e.pointerId);
+});
+card.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  dx = e.clientX - startX;
+  setCardTransform(dx);
+});
+card.addEventListener('pointerup', (e) => {
+  if (!dragging) return;
+  dragging = false; card.classList.remove('dragging');
+  cardBack.style.transition = '';
+  if (Math.abs(dx) > 100) {
+    const dir = dx > 0 ? 1 : -1;
+    card.style.transform = `translateX(${dir * 600}px) rotate(${dir*30}deg)`;
+    card.style.opacity = '0';
+    tintYes.style.opacity = tintNo.style.opacity = 0;
+    setTimeout(() => nextCard(), 320);
+  } else {
+    setCardTransform(0);
+    // also reset back card
+    cardBack.style.transform = '';
+    cardBack.style.opacity = '';
+  }
+});
+
+function nextCard() {
+  acceptedCount++;
+  if (acceptedCount >= totalCards) {
+    runLoadingThenResults();
+    acceptedCount = 12;
+    return;
+  }
+  // Promote the back card visually first
+  cardBack.classList.remove('behind');
+  cardBack.classList.add('front', 'rising');
+
+  // After the rise animation, reset front card and swap text
+  setTimeout(() => {
+    factIdx = (factIdx + 1) % facts.length;
+    const nextFact = facts[(factIdx + 1) % facts.length];
+    // Reset the (now hidden) front card position and show next fact behind
+    card.style.transition = 'none';
+    card.style.transform = '';
+    card.style.opacity = '';
+    document.getElementById('fact-text').textContent = facts[factIdx];
+    // Update back card text to the *next* upcoming fact
+    document.getElementById('fact-text-back').textContent = nextFact;
+    // Restore back card to behind state and front card to front
+    cardBack.classList.remove('front', 'rising');
+    cardBack.classList.add('behind');
+    cardBack.style.transform = '';
+    cardBack.style.opacity = '';
+    // Force reflow then re-enable transition
+    void card.offsetWidth;
+    card.style.transition = '';
+    // acceptedCount counts cards already swiped; the visible card is N+1 (1-indexed).
+    document.getElementById('card-progress').textContent = `${acceptedCount + 1} of ${totalCards}`;
+  }, 340);
+}
+
+function runLoadingThenResults() {
+  navigate('screen-loading');
+  const steps = ['Analyzing your profile…', 'Building your scenarios…', 'Almost ready…'];
+  const el = document.getElementById('loading-text');
+  let i = 0;
+  el.textContent = steps[0];
+  const tick = () => {
+    i++;
+    if (i >= steps.length) {
+      setTimeout(() => navigate('screen-7'), 800);
+      return;
+    }
+    el.style.opacity = 0;
+    setTimeout(() => {
+      el.textContent = steps[i];
+      el.style.opacity = 1;
+      setTimeout(tick, 1100);
+    }, 250);
+  };
+  setTimeout(tick, 1100);
+}
+
+// Snapshot of the card text taken at the moment openClarify() runs.
+// On cancel, the card is restored to look exactly as it did before Clarify
+// was tapped. null = no clarify in progress.
+let originalFactBeforeClarify = null;
+
+function openClarify() {
+  const factEl = document.getElementById('fact-text');
+  // Capture the card text exactly as it appears right now — every call.
+  originalFactBeforeClarify = factEl.textContent;
+  document.getElementById('clarify-area').classList.add('open');
+  document.getElementById('confirm-state').classList.remove('open');
+  document.getElementById('clarify-input').value = '';
+  setTimeout(() => document.getElementById('clarify-input').focus(), 100);
+}
+
+function cancelClarify() {
+  // Restore the card to look exactly as it did before the user tapped Clarify:
+  //  - fact-text reverts to the snapshot
+  //  - confirm-state is hidden if it was open
+  //  - clarify input is emptied
+  const factEl = document.getElementById('fact-text');
+  if (originalFactBeforeClarify !== null) {
+    factEl.textContent = originalFactBeforeClarify;
+    factEl.style.opacity = 1;
+    originalFactBeforeClarify = null;
+  }
+  document.getElementById('clarify-area').classList.remove('open');
+  document.getElementById('confirm-state').classList.remove('open');
+  document.getElementById('clarify-input').value = '';
+}
+
+function sendClarify() {
+  const input = document.getElementById('clarify-input');
+  if (!input.value.trim()) return;
+  const factEl = document.getElementById('fact-text');
+  factEl.textContent = 'Updating…';
+  factEl.style.opacity = 0.5;
+  const newText = input.value.trim().replace(/\.?$/, '.');
+  // Capitalize first char
+  const corrected = newText.charAt(0).toUpperCase() + newText.slice(1);
+  setTimeout(() => {
+    // Show the proposed rewrite — NOT yet permanent. Will be committed
+    // only when the user taps "Yes" in the confirm-state. If they cancel
+    // or "Clarify again", originalFactBeforeClarify still holds the truth.
+    factEl.textContent = corrected;
+    factEl.style.opacity = 1;
+    input.value = '';
+    document.getElementById('clarify-area').classList.remove('open');
+    document.getElementById('confirm-state').classList.add('open');
+  }, 800);
+}
+
+function acceptCorrection() {
+  // Commit the rewrite permanently — clear the stored original.
+  originalFactBeforeClarify = null;
+  document.getElementById('confirm-state').classList.remove('open');
+  nextCard();
+}
+
+// ============ Screen 8 — Milestones, radar, chart ============
+const milestones = [
+  'Start: take an AI-for-legal foundations course and start using an AI drafting tool on small matters.',
+  '6 months: lead an AI-assisted matter end-to-end. Build a small library of AI workflows for your practice.',
+  '1 year: become the AI lead in your firm or launch a boutique AI-assisted practice. Publish a case study.',
+];
+function selectMilestone(i) {
+  document.querySelectorAll('.timeline-dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
+  const card = document.getElementById('milestone-card');
+  card.textContent = milestones[i];
+  card.classList.add('open');
+}
+
+// Radar chart
+const radarAxes = [
+  { name: 'Strategy', have: 0.9, need: 0.95, desc: 'You have strong strategic instincts. Need: deeper AI-strategy frameworks.' },
+  { name: 'AI tools', have: 0.3, need: 0.85, desc: 'Gap: 55%. Learn to use core legal AI platforms (Harvey, CoCounsel).' },
+  { name: 'Comms', have: 0.85, need: 0.8, desc: 'You exceed the bar. Keep refining executive narrative.' },
+  { name: 'Domain', have: 0.95, need: 0.7, desc: 'Your 20 years of corporate law is a moat.' },
+  { name: 'Data', have: 0.4, need: 0.75, desc: 'Gap: 35%. Learn to read AI outputs critically.' },
+  { name: 'Ops', have: 0.55, need: 0.7, desc: 'Workflow design for AI-augmented practice.' },
+];
+function buildRadar() {
+  const svg = document.getElementById('radar-svg');
+  if (!svg) return;
+  const n = radarAxes.length;
+  const R = 110;
+  svg.innerHTML = '';
+  // grid rings
+  for (let r = 1; r <= 4; r++) {
+    const rr = R * r / 4;
+    const pts = radarAxes.map((_, i) => {
+      const a = -Math.PI/2 + i * 2*Math.PI/n;
+      return [Math.cos(a)*rr, Math.sin(a)*rr];
+    });
+    const d = pts.map((p, i) => (i?'L':'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') + ' Z';
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#E0E0E0');
+    path.setAttribute('stroke-width', '1');
+    svg.appendChild(path);
+  }
+  // axes
+  radarAxes.forEach((_, i) => {
+    const a = -Math.PI/2 + i * 2*Math.PI/n;
+    const x = Math.cos(a)*R, y = Math.sin(a)*R;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 0); line.setAttribute('y1', 0);
+    line.setAttribute('x2', x); line.setAttribute('y2', y);
+    line.setAttribute('stroke', '#E0E0E0'); line.setAttribute('stroke-width','1');
+    svg.appendChild(line);
+  });
+  // need polygon (dashed outline)
+  const needPts = radarAxes.map((ax, i) => {
+    const a = -Math.PI/2 + i * 2*Math.PI/n;
+    return [Math.cos(a)*R*ax.need, Math.sin(a)*R*ax.need];
+  });
+  const needPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  needPath.setAttribute('d', needPts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+' Z');
+  needPath.setAttribute('fill','none');
+  needPath.setAttribute('stroke','#1A1A1A');
+  needPath.setAttribute('stroke-width','1.5');
+  needPath.setAttribute('stroke-dasharray','4,3');
+  svg.appendChild(needPath);
+  // have polygon (filled)
+  const havePts = radarAxes.map((ax, i) => {
+    const a = -Math.PI/2 + i * 2*Math.PI/n;
+    return [Math.cos(a)*R*ax.have, Math.sin(a)*R*ax.have];
+  });
+  const havePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  havePath.setAttribute('d', havePts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+' Z');
+  havePath.setAttribute('fill','rgba(26,26,26,0.85)');
+  havePath.setAttribute('stroke','#1A1A1A');
+  havePath.setAttribute('stroke-width','1');
+  svg.appendChild(havePath);
+  // tappable axis points + labels
+  radarAxes.forEach((ax, i) => {
+    const a = -Math.PI/2 + i * 2*Math.PI/n;
+    const lx = Math.cos(a)*(R+22), ly = Math.sin(a)*(R+22);
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', lx); label.setAttribute('y', ly);
+    label.setAttribute('text-anchor','middle'); label.setAttribute('dominant-baseline','middle');
+    label.setAttribute('class','radar-axis-label');
+    label.setAttribute('fill','#1A1A1A');
+    label.textContent = ax.name;
+    label.onclick = () => showRadarTip(i);
+    svg.appendChild(label);
+    // tap point
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', Math.cos(a)*R); dot.setAttribute('cy', Math.sin(a)*R);
+    dot.setAttribute('r', 14); dot.setAttribute('fill','transparent');
+    dot.style.cursor = 'pointer';
+    dot.onclick = () => showRadarTip(i);
+    svg.appendChild(dot);
+  });
+}
+buildRadar();
+
+function showRadarTip(i) {
+  const tip = document.getElementById('radar-tip');
+  tip.classList.add('open');
+  tip.innerHTML = `<strong>${radarAxes[i].name}</strong> — ${radarAxes[i].desc}`;
+}
+
+const chartContext = [
+  '2024: $12B — Early adoption in big-law firms; pilot projects dominate.',
+  '2025: $24B — Mainstream legal AI platforms reach mid-market firms.',
+  '2026: $41B — Standard in most professional practices.',
+];
+function showChartTip(i) {
+  const tip = document.getElementById('chart-tip');
+  tip.classList.add('open');
+  tip.textContent = chartContext[i];
+}
+
+// ============ Screen 9 — show more ============
+let expanded = false;
+function toggleShowMore(el) {
+  expanded = !expanded;
+  document.querySelectorAll('#cat1, #cat2, #cat3').forEach(c => c.classList.toggle('collapsed', !expanded));
+  el.textContent = expanded ? 'Show less' : 'Show more';
+}
+
+// ============ Toast ============
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ============ Screen 8 — Share sheet & First step sheet ============
+function openShareSheet() { document.getElementById('share-sheet').classList.add('open'); }
+function closeShareSheet() { document.getElementById('share-sheet').classList.remove('open'); }
+function openFirstStepSheet() { document.getElementById('first-step-sheet').classList.add('open'); }
+function closeFirstStepSheet() { document.getElementById('first-step-sheet').classList.remove('open'); }
+
+// ============ Back navigation ============
+// Pops the previous screen off navHistory and switches to it WITHOUT recording
+// anything new — back navigation is unidirectional. Falls back to screen-8 if
+// the stack is empty (used by screen-9's hard-wired back arrow).
+function goBack() {
+  const prev = navHistory.pop();
+  switchScreen(prev || 'screen-8');
+}
+
+// ============ Screen 9 — Update sheet, retake, photo, edit ============
+function openUpdateSheet() { document.getElementById('update-sheet').classList.add('open'); }
+function closeUpdateSheet() {
+  document.getElementById('update-sheet').classList.remove('open');
+  document.getElementById('add-context-panel').style.display = 'none';
+}
+function pickDocuments() {
+  // Simulate native file picker
+  alert('Files\n\nChoose documents to add to your profile');
+  closeUpdateSheet();
+  showToast('Documents added');
+}
+function openAddContext() {
+  document.getElementById('add-context-panel').style.display = 'block';
+  setTimeout(() => document.getElementById('context-input').focus(), 100);
+}
+function submitContext() {
+  const v = document.getElementById('context-input').value.trim();
+  if (!v) return;
+  document.getElementById('context-input').value = '';
+  closeUpdateSheet();
+  showToast('Context added to profile');
+}
+
+function openRetakeConfirm() { document.getElementById('retake-confirm').classList.add('open'); }
+function closeRetakeConfirm() { document.getElementById('retake-confirm').classList.remove('open'); }
+function confirmRetake() {
+  closeRetakeConfirm();
+  navigate('screen-5');
+}
+
+function openPhotoPicker() { document.getElementById('photo-picker').classList.add('open'); }
+function closePhotoPicker() { document.getElementById('photo-picker').classList.remove('open'); }
+function pickPhoto(source) {
+  closePhotoPicker();
+  showToast(source === 'camera' ? 'Camera opened' : 'Photo selected');
+}
+
+// ============ Screen 9 — My data list ============
+const dataItems = {
+  voice: {
+    name: 'Voice analysis',
+    meta: 'Tone · pace · sentiment',
+    icon: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>',
+    files: ['Recording 1', 'Recording 2', 'Recording 3'],
+    added: true,
+  },
+  face: {
+    name: 'Facial expressions',
+    meta: 'Micro-emotion patterns',
+    icon: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
+    files: ['Session Apr 12', 'Session May 3'],
+    added: true,
+  },
+  research: {
+    name: 'Deep research',
+    meta: 'Public context about you',
+    icon: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
+    files: ['LinkedIn profile', 'Public articles'],
+    added: true,
+  },
+  docs: {
+    name: 'Documents',
+    meta: 'CV · portfolio · contracts',
+    icon: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+    files: ['CV.pdf', 'Portfolio.pdf', 'Contract.pdf'],
+    added: true,
+  },
+};
+let pendingDataDeleteKey = null;
+
+function renderDataList() {
+  const list = document.getElementById('data-list');
+  if (!list) return;
+  list.innerHTML = Object.entries(dataItems).map(([key, item]) => `
+    <div class="data-row ${item.added ? '' : 'not-added'}" onclick="onDataRowClick('${key}')">
+      <div class="data-icon">${item.icon}</div>
+      <div class="data-info">
+        <div class="data-name">${item.name}</div>
+        <div class="data-meta">${item.meta}</div>
+      </div>
+      <div class="data-action ${item.added ? '' : 'add'}" onclick="event.stopPropagation(); onDataActionClick('${key}')">${item.added ? 'Delete' : 'Add'}</div>
+    </div>
+  `).join('');
+}
+
+function onDataRowClick(key) {
+  if (!dataItems[key].added) return; // not-added rows do nothing on body tap
+  openDataDetail(key);
+}
+
+function onDataActionClick(key) {
+  if (dataItems[key].added) {
+    pendingDataDeleteKey = key;
+    document.getElementById('data-delete-msg').textContent =
+      `"${dataItems[key].name}" will be removed from your profile.`;
+    document.getElementById('data-delete-confirm').classList.add('open');
+  } else {
+    // Add → flip back to added state, no modal
+    dataItems[key].added = true;
+    renderDataList();
+  }
+}
+
+function confirmDataDelete() {
+  if (pendingDataDeleteKey) {
+    dataItems[pendingDataDeleteKey].added = false;
+    pendingDataDeleteKey = null;
+    renderDataList();
+  }
+  document.getElementById('data-delete-confirm').classList.remove('open');
+}
+
+function cancelDataDelete() {
+  pendingDataDeleteKey = null;
+  document.getElementById('data-delete-confirm').classList.remove('open');
+}
+
+function openDataDetail(key) {
+  const item = dataItems[key];
+  document.getElementById('data-detail-title').textContent = item.name;
+  document.getElementById('data-detail-meta').textContent = item.meta;
+  const filesEl = document.getElementById('data-detail-files');
+  const fileIcon = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+  filesEl.innerHTML = item.files.map(f => `
+    <div class="file-row">
+      <div class="file-icon">${fileIcon}</div>
+      <div class="file-name">${f}</div>
+    </div>
+  `).join('');
+  document.getElementById('data-detail').classList.add('open');
+}
+
+function closeDataDetail() {
+  document.getElementById('data-detail').classList.remove('open');
+}
+
+// Initial render
+renderDataList();
+
+let editMode = false;
+function toggleEditMode() {
+  editMode = !editMode;
+  document.querySelectorAll('.cat-text').forEach(t => t.style.display = editMode ? 'none' : '');
+  document.querySelectorAll('.cat-edit').forEach(t => t.style.display = editMode ? 'block' : 'none');
+  document.getElementById('edit-actions').style.display = editMode ? 'flex' : 'none';
+  document.getElementById('show-more-link').style.display = editMode ? 'none' : 'inline-block';
+  document.getElementById('edit-link').textContent = editMode ? 'Done' : 'Edit';
+}
+function saveEdits() {
+  ['cat1','cat2','cat3'].forEach(id => {
+    const v = document.getElementById(id + '-edit').value;
+    document.getElementById(id).textContent = v;
+  });
+  toggleEditMode();
+  showToast('Profile saved');
+}
+function cancelEdits() {
+  // Restore textareas from text values
+  ['cat1','cat2','cat3'].forEach(id => {
+    document.getElementById(id + '-edit').value = document.getElementById(id).textContent;
+  });
+  toggleEditMode();
+}
+</script>
+</body>
+</html>
